@@ -11,6 +11,8 @@ const PORT = process.env.PORT || 3500;
 import connectDB from './Config/dbConn.js';
 
 import RegisterRoute from './Routes/registerRoute.js';
+import LoginRoute from './Routes/loginRoute.js';
+import LogoutRoute from './Routes/logoutRoute.js'
 
 const app = express();
 
@@ -23,6 +25,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use('/register', RegisterRoute);
+app.use('/login', LoginRoute);
+app.use('/logout', LogoutRoute);
 
 mongoose.connection.once('open', () => {
     app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
