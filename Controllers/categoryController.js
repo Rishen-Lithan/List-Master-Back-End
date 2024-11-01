@@ -9,14 +9,12 @@ export const getAllCategories = async (req, res) => {
 export const createCategory = async (req, res) => {
     if (!req?.body?.category) {
         return res.status(400).json({ 'message': 'Please Enter the Category '});
-    } else if (!req?.body?.categoryStatus) {
-        return res.status(400).json({ 'message': 'Category Status is required' });
     }
 
     try {
         const category = await Category.create({
             category: req.body.category,
-            categoryStatus: req.body.categoryStatus
+            categoryStatus: 1
         });
 
         res.status(200).json(category)
