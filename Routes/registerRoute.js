@@ -1,7 +1,12 @@
 import express from 'express'
-import handleNewUser from '../Controllers/registerController.js';
+import { handleNewUser, handleNewVendor } from '../Controllers/registerController.js';
+
 const router = express.Router();
 
-router.post('/', handleNewUser);
+router.route('/')
+    .post(handleNewUser);
 
+router.route('/vendor')
+    .post(handleNewVendor);
+    
 export default router;
