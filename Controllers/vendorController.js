@@ -67,6 +67,7 @@ export const updatedVendorProfile = async (req, res) => {
             return res.status(404).json({ message: 'Vendor not found' });
         }
 
+        // Allowed properties to update
         if (vendorName) vendor.vendorName = vendorName;
         if (address) vendor.address = address;
         if (contact) vendor.contact = contact;
@@ -87,3 +88,32 @@ export const updatedVendorProfile = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
+export const addComments = async (req, res) => {
+    const { vendorId, comment } = req.body;
+
+    if (!vendorId) {
+        return res.status(400).json({ 'message': 'Vendor ID is required' });
+    } else if (!comment) {
+        return res.status(400).json({ 'message': 'Please add a comment ' });
+    }
+
+    try {
+        const vendor = await Vendor.findById(vendorId);
+        if (!vendor) {
+            return res.status(404).json({ 'message': 'No vendor found' });
+        }
+
+        vendor.comments.push(comment);
+
+        await vendor.save();
+
+        return res.status(201).json({ 
+            message: 'Comment added successfully ',
+            comments: vendor.comments
+        })
+    } catch (error) {
+        console.error('Error adding comment : ', error);
+        return res.status(500).json({ 'message': 'Failed to add comments for the vendor' });
+    }
+}

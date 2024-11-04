@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllVendors, getVendorByID, deleteVendorProfile, updatedVendorProfile } from '../Controllers/vendorController.js';
+import { getAllVendors, getVendorByID, deleteVendorProfile, updatedVendorProfile, addComments } from '../Controllers/vendorController.js';
 
 const router = express.Router();
 
@@ -9,6 +9,9 @@ router.route('/')
     .put(updatedVendorProfile);
 
 router.route('/:id')
-    .get(getVendorByID)
+    .get(getVendorByID);
+
+router.route('/add_comments')
+    .post(addComments);
 
 export default router;

@@ -2,6 +2,10 @@ import User from "../Models/userModel.js";
 import Vendor from '../Models/vendorModel.js';
 import bcrypt from 'bcrypt';
 import validator from "validator";
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const handleNewUser = async (req, res) => {
     const { email, pwd } = req.body;
@@ -94,7 +98,30 @@ export const handleNewVendor = async (req, res) => {
         });
         await newUser.save();
 
-        res.status(201).json({ message: 'Vendor created successfully', vendor: savedVendor });
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Welcome to List Master',
+            text: `Hello ${vendorName},\n\nYour vendor account has been created successfully!\n\nEmail: ${email}\nPassword: ${pwd}\n\nPlease change your password after your first login for security reasons.\n\nBest Regards,\nList Master`,
+        }
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending email:', error);
+                return res.status(500).json({ message: 'Vendor created, but error sending email' });
+            }
+            console.log('Email sent : ', info.response);
+            res.status(201).json({ message: 'Vendor created successfully', vendor: savedVendor });
+        });
+
     } catch (error) {
         console.error('Error creating vendor:', error);
         res.status(500).json({ message: 'Internal Server Error' });
