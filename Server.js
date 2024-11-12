@@ -21,6 +21,7 @@ import CategoryRoutes from './Routes/categoryRoutes.js';
 import UserRoutes from './Routes/userRoutes.js';
 import VendorRoutes from './Routes/vendorRoutes.js';
 import ProductRoutes from './Routes/productRoutes.js';
+import OrderRoutes from './Routes/orderRoutes.js';
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use('/category', CategoryRoutes);
 app.use('/users', UserRoutes);
 app.use('/vendor', VendorRoutes);
 app.use('/products', ProductRoutes);
+app.use('/orders', OrderRoutes);
 
 mongoose.connection.once('open', () => {
     app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

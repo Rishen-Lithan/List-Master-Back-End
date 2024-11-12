@@ -2,6 +2,7 @@ import Product from "../Models/productModel.js";
 import multer from "multer";
 import { fileURLToPath } from 'url';
 import path from 'path';
+import Vendor from '../Models/vendorModel.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,20 +33,20 @@ const upload = multer({
     }
 }).single('image');
 
-export const addProduct = (req, res) => {
-    upload(req, res, (err) => {
+export const addProduct = async (req, res) => {
+    upload(req, res, async (err) => {
         if (err) {
             return res.status(400).json({ message: err.message });
         }
 
         const { name, description, category, price, remainingQuantity } = req.body;
-        
+
         if (!name) {
             return res.status(400).json({ message: 'Please enter the product name' });
         } else if (!description) {
             return res.status(400).json({ message: 'Please enter the description' });
         } else if (description.length > 250) {
-            return res.status(400).json({ message: 'Description length should be less than 250 character' });
+            return res.status(400).json({ message: 'Description length should be less than 250 characters' });
         } else if (!category) {
             return res.status(400).json({ message: 'Please select a category' });
         } else if (!price) {
@@ -58,30 +59,43 @@ export const addProduct = (req, res) => {
             return res.status(400).json({ message: 'Please select an Image' });
         }
 
-        const relativeImagePath = path.relative(process.cwd(), req.file.path);
+        const vendorEmail = req.user;
+        if (!vendorEmail) {
+            return res.status(403).json({ message: 'Unauthorized: No vendor information found' });
+        }
 
-        const newProduct = new Product({
-            name,
-            image: relativeImagePath,
-            description,
-            category,
-            price: Number(price),
-            remainingQuantity: Number(remainingQuantity),
-        });
+        try {
+            const vendor = await Vendor.findOne({ email: vendorEmail });
+            if (!vendor) {
+                return res.status(404).json({ message: "Vendor not found" });
+            }
 
-        newProduct.save()
-            .then(product => {
-                res.status(201).json({ message: 'Product added successfully', product });
-            })
-            .catch(error => {
-                console.error("Error saving product:", error);
-                res.status(500).json({ message: 'Error adding product' });
+            const relativeImagePath = path.relative(process.cwd(), req.file.path);
+
+            const newProduct = new Product({
+                name,
+                image: relativeImagePath,
+                description,
+                category,
+                price: Number(price),
+                remainingQuantity: Number(remainingQuantity),
+                vendor: vendor._id,
             });
+
+            const product = await newProduct.save();
+
+            const populatedProduct = await Product.findById(product._id).populate('vendor', 'email vendorName contact address company');
+
+            return res.status(201).json({ message: 'Product added successfully', product: populatedProduct });
+        } catch (error) {
+            console.error("Error adding product:", error);
+            return res.status(500).json({ message: 'Error adding product' });
+        }
     });
-}
+};
 
 export const getProducts = async (req, res) => {
-    const products = await Product.find();
+    const products = await Product.find().populate('vendor', 'email vendorName contact address company');
     if (!products) {
         return res.status(404).json({ 'message': 'No Products Available' });
     }
@@ -94,7 +108,7 @@ export const getProductById = async (req, res) => {
     }
 
     try {
-        const product = await Product.findById({ _id: req.params.id });
+        const product = await Product.findById({ _id: req.params.id }).populate('vendor', 'email vendorName contact address company');
         if (!product) {
             return res.status(404).json({ 'message': 'No product found with that ID ' });
         }

@@ -27,6 +27,11 @@ const productSchema = mongoose.Schema({
         type: Number,
         required: true,
         min: 0
+    },
+    vendor: {
+        type: Schema.Types.ObjectId,
+        ref: 'Vendor',
+        required: true
     }
 })
 
