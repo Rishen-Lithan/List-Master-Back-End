@@ -20,6 +20,7 @@ import LogoutRoute from './Routes/logoutRoute.js'
 import CategoryRoutes from './Routes/categoryRoutes.js';
 import UserRoutes from './Routes/userRoutes.js';
 import VendorRoutes from './Routes/vendorRoutes.js';
+import ProductRoutes from './Routes/productRoutes.js';
 
 const app = express();
 
@@ -42,7 +43,7 @@ app.use(verifyJWT);
 app.use('/category', CategoryRoutes);
 app.use('/users', UserRoutes);
 app.use('/vendor', VendorRoutes);
-
+app.use('/products', ProductRoutes);
 
 mongoose.connection.once('open', () => {
     app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
