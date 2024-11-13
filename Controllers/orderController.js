@@ -1,6 +1,7 @@
 import Orders from "../Models/orderModel.js";
 import Product from "../Models/productModel.js";
 import validator from "validator";
+import nodemailer from 'nodemailer';
 
 export const createOrder = async (req, res) => {
     const { quantity, deliveryNote, address, product: productId, name, email } = req.body;
@@ -48,7 +49,29 @@ export const createOrder = async (req, res) => {
 
         const populatedOrder = await Orders.findById(createdOrder._id).populate('product').populate('vendor', 'email vendorName contact address company');
 
-        return res.status(201).json(populatedOrder);
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: 'Notification from List Master',
+            text: `Hello ${name},\n\nYour order has been created successfully!\n\n\nBest Regards,\nList Master`,
+        }
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('Error sending email:', error);
+                return res.status(500).json({ message: 'Order created, but error sending email' });
+            }
+            console.log('Email sent : ', info.response);
+            return res.status(201).json(populatedOrder);
+        });
 
     } catch (error) {
         console.error('Error creating order : ', error);
