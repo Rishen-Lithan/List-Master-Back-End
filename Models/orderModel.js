@@ -24,7 +24,15 @@ const orderSchema = new Schema({
         ref: 'Vendor'  // Reference to the Vendor model, if needed
     },
     orderStatus: {
-        type: Number, // 0 - Pending || 1 - Processing || 2 - Dispatch || 3 - Delivered || 4 - Cancel || 5 - Requested to Cancel || 6 - Returned
+        type: Number, // 0 - Pending || 1 - Processing || 2 - Dispatch || 3 - Delivered || 4 - Cancel
+        required: true,
+    },
+    name: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
         required: true,
     }
 })

@@ -7,8 +7,8 @@ const router = express.Router();
 
 router.route('/')
     .get(getAllCategories)
-    .post(createCategory)
-    .put(changeCategoryStatus)
-    .delete(deleteCategory);
+    .post(verifyRoles(ROLES_LIST.Vendor, ROLES_LIST.Admin), createCategory)
+    .put(verifyRoles(ROLES_LIST.Vendor, ROLES_LIST.Admin),changeCategoryStatus)
+    .delete(verifyRoles(ROLES_LIST.Admin),deleteCategory);
 
 export default router;
