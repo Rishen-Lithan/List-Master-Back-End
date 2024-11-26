@@ -14,7 +14,7 @@ import connectDB from './Config/dbConn.js';
 // Auth Routes
 import RegisterRoute from './Routes/registerRoute.js';
 import LoginRoute from './Routes/loginRoute.js';
-import LogoutRoute from './Routes/logoutRoute.js'
+import LogoutRoute from './Routes/logoutRoute.js';
 
 // Other Routes
 import CategoryRoutes from './Routes/categoryRoutes.js';
@@ -37,12 +37,12 @@ app.use(cookieParser());
 app.use('/register', RegisterRoute);
 app.use('/login', LoginRoute);
 app.use('/logout', LogoutRoute);
+app.use('/users', UserRoutes);
 
 app.use(verifyJWT);
 
 // Other-Routes
 app.use('/category', CategoryRoutes);
-app.use('/users', UserRoutes);
 app.use('/vendor', VendorRoutes);
 app.use('/products', ProductRoutes);
 app.use('/orders', OrderRoutes);

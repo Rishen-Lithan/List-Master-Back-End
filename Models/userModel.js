@@ -18,7 +18,9 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    refreshToken: String
+    refreshToken: String,
+    passwordResetToken: String,
+    passwordResetExpires: Date
 })
 
 export default mongoose.model('User', userSchema);
